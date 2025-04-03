@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#define MAX_TASKS 5
+
+
+typedef struct {
+    int id;
+    int period;
+    int execution;
+} Task;
+
+int compare(const void *a, const void *b) {
+    Task *taskA = (Task *)a;
+    Task *taskB = (Task *)b;
+    return taskA->period - taskB->period;
+}
+
+void rateMonotonicScheduling(Task tasks[], int numTasks, int totalTime) {
+    int time = 0;
+
+    while (time < totalTime) {
+        for (int i = 0; i < numTasks; i++) {
+            if (time % tasks[i].period == 0) {
+                printf("At time %d ms: Task %d (Period: %d ms) is executing for %d ms\n", time, tasks[i].id, tasks[i].period, tasks[i].execution);
+                usleep(tasks[i].execution * 1000);
+            }
+        }
+        time++;
+    }
+}
+
+int main() {
+
+    Task tasks[MAX_TASKS] = {
+        {1, 5, 1},
+        {2, 10, 2},
+        {3, 15, 3},
+        {4, 20, 4},
+        {5, 25, 5}
+    };
+
+    int numTasks = 5;
+    int totalTime = 50;
+
+
+    qsort(tasks, numTasks, sizeof(Task), compare);
+
+    rateMonotonicScheduling(tasks, numTasks, totalTime);
+
+    return 0;
+}
