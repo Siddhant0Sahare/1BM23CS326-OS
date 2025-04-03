@@ -1,0 +1,97 @@
+// Multi-Level Queue
+
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 10
+
+
+typedef struct {
+    int id;
+    int arrival;
+    int burst;
+    int remaining;
+    int completed;
+} Process;
+
+
+void FCFS(Process queue[], int n) {
+    int time = 0;
+    for (int i = 0; i < n; i++) {
+        if (queue[i].arrival > time)
+            time = queue[i].arrival;
+
+        printf("Process %d starts at time %d and ends at time %d\n", queue[i].id, time, time + queue[i].burst);
+        time += queue[i].burst;
+        queue[i].completed = 1;
+    }
+}
+
+a
+void RoundRobin(Process queue[], int n, int quantum) {
+    int time = 0;
+    int completed = 0;
+    int i = 0;
+
+    while (completed < n) {
+        if (queue[i].completed == 0 && queue[i].remaining > 0) {
+            int burst_time = queue[i].remaining > quantum ? quantum : queue[i].remaining;
+            printf("Process %d runs from time %d to %d (Quantum: %d)\n", queue[i].id, time, time + burst_time, burst_time);
+            time += burst_time;
+            queue[i].remaining -= burst_time;
+
+            if (queue[i].remaining == 0) {
+                queue[i].completed = 1;
+                completed++;
+            }
+        }
+        i = (i + 1) % n;
+    }
+}
+
+int main() {
+    int n, i, quantum;
+
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
+
+    Process high_queue[MAX], low_queue[MAX];
+    int high_count = 0, low_count = 0;
+
+
+    for (i = 0; i < n; i++) {
+        printf("\nEnter details for Process %d:\n", i + 1);
+        printf("Arrival Time: ");
+        scanf("%d", &high_queue[i].arrival);
+        printf("Burst Time: ");
+        scanf("%d", &high_queue[i].burst);
+        printf("Priority (1 for high, 2 for low): ");
+        int priority;
+        scanf("%d", &priority);
+
+        high_queue[i].id = i + 1;
+        high_queue[i].remaining = high_queue[i].burst;
+        high_queue[i].completed = 0;
+
+        if (priority == 1) {
+            high_queue[high_count++] = high_queue[i];
+        } else if (priority == 2) {
+            low_queue[low_count++] = high_queue[i];
+        }
+    }
+
+    printf("\nEnter the time quantum for Round Robin scheduling: ");
+    scanf("%d", &quantum);
+
+
+    printf("\nHigh-priority queue (FCFS scheduling):\n");
+    FCFS(high_queue, high_count);
+
+
+    printf("\nLow-priority queue (Round Robin scheduling):\n");
+    RoundRobin(low_queue, low_count, quantum);
+
+    return 0;
+}
