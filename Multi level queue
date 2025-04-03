@@ -1,13 +1,7 @@
 // Multi-Level Queue
-
-
-
 #include <stdio.h>
 #include <stdlib.h>
-
 #define MAX 10
-
-
 typedef struct {
     int id;
     int arrival;
@@ -15,26 +9,21 @@ typedef struct {
     int remaining;
     int completed;
 } Process;
-
-
 void FCFS(Process queue[], int n) {
     int time = 0;
     for (int i = 0; i < n; i++) {
         if (queue[i].arrival > time)
             time = queue[i].arrival;
-
         printf("Process %d starts at time %d and ends at time %d\n", queue[i].id, time, time + queue[i].burst);
         time += queue[i].burst;
         queue[i].completed = 1;
     }
 }
 
-a
 void RoundRobin(Process queue[], int n, int quantum) {
     int time = 0;
     int completed = 0;
     int i = 0;
-
     while (completed < n) {
         if (queue[i].completed == 0 && queue[i].remaining > 0) {
             int burst_time = queue[i].remaining > quantum ? quantum : queue[i].remaining;
@@ -53,14 +42,10 @@ void RoundRobin(Process queue[], int n, int quantum) {
 
 int main() {
     int n, i, quantum;
-
     printf("Enter the number of processes: ");
     scanf("%d", &n);
-
     Process high_queue[MAX], low_queue[MAX];
     int high_count = 0, low_count = 0;
-
-
     for (i = 0; i < n; i++) {
         printf("\nEnter details for Process %d:\n", i + 1);
         printf("Arrival Time: ");
