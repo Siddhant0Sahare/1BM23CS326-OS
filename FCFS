@@ -1,72 +1,32 @@
 #include<stdio.h>
-
-#define MAX 100
-
-int p[MAX], bt[MAX], at[MAX], tat[MAX], wt[MAX], ct[MAX], n;
-
-void fcfs();  // Function to implement FCFS scheduling
-void display(); // Function to display the results
-
-int main() {
-    printf("Enter the number of processes: ");
-    scanf("%d", &n);
-
-    // Input data for processes
-    printf("Enter the process data (Process No, Arrival Time, Burst Time):\n");
-    for (int i = 0; i < n; i++) {
-        printf("Process %d:\n", i + 1);
-        printf("Arrival Time: ");
-        scanf("%d", &at[i]);
-        printf("Burst Time: ");
-        scanf("%d", &bt[i]);
-        p[i] = i + 1;  // Process number
+int main(){
+    int n, bt[20], wt[20], tat[20], i, at[20];
+    float wtavg=0;
+    float tatavg=0;
+    printf("Enter the total number of processors here:");
+    scanf("%d",&n);
+    for(i=0;i<n;i++){
+        printf("Enter the burst time of the processor:");
+        scanf("%d",&bt[i]);
     }
+    wt[0]=0;
+    tat[0]=bt[0];
+    for(i=1;i<n;i++){
+        wt[i]=wt[i-1]+bt[i-1];
+        wtavg+=wt[i];
+    }
+    for(i=0;i<n;i++){
+        tat[i]=tat[i-1]+bt[i];
+        tatavg+=tat[i];
+    }
+    tatavg/=n;
+    wtavg/=n;
 
-    fcfs();  // Call FCFS function
-    display();  // Display results
-
-    return 0;
-}
-
-void fcfs() {
-    int totalTAT = 0, totalWT = 0;
+    printf("Processor\t Burst TIme\t Waiting Time\t TurnAroundtime\n");
+    for(i=0;i<n;i++){
+        printf("P%d\t\t%d\t\t%d\t\t%d\n", i+1,bt[i],wt[i],tat[i]);
+    }
+    printf("Average WT = %.2f", wtavg);
+    printf("Average TAT = %.2f", tatavg);
     
-    // Compute Completion Time (CT), Turnaround Time (TAT), and Waiting Time (WT)
-    ct[0] = at[0] + bt[0];  // First process' CT
-    tat[0] = ct[0] - at[0];  // First process' TAT
-    wt[0] = tat[0] - bt[0];  // First process' WT
-
-    // For subsequent processes
-    for (int i = 1; i < n; i++) {
-        // Completion time of the process
-        if (at[i] > ct[i-1]) {
-            ct[i] = at[i] + bt[i];  // Wait for the process if it arrives after previous process finishes
-        } else {
-            ct[i] = ct[i-1] + bt[i];  // Process starts after previous process finishes
-        }
-        
-        // Turnaround time and waiting time
-        tat[i] = ct[i] - at[i];
-        wt[i] = tat[i] - bt[i];
-    }
-
-    // Calculate the total Turnaround Time and Waiting Time
-    for (int i = 0; i < n; i++) {
-        totalTAT += tat[i];
-        totalWT += wt[i];
-    }
-
-    // Calculate average Turnaround Time and Waiting Time
-    float avgTAT = (float)totalTAT / n;
-    float avgWT = (float)totalWT / n;
-
-    printf("\nThe avg TAT = %.2f\nThe avg WT = %.2f\n", avgTAT, avgWT);
-}
-
-void display() {
-    // Display Process details
-    printf("\nProcess\tAT\tBT\tCT\tTAT\tWT\n");
-    for (int i = 0; i < n; i++) {
-        printf("%d\t%d\t%d\t%d\t%d\t%d\n", p[i], at[i], bt[i], ct[i], tat[i], wt[i]);
-    }
 }
