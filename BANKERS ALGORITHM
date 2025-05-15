@@ -1,0 +1,98 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+#define P 5  // Number of processes
+#define R 3  // Number of resources
+
+// Function to find if the system is in a safe state
+bool isSafe(int processes[], int avail[], int max[][R], int allot[][R], int need[][R]) {
+    int work[R], finish[P];
+    for (int i = 0; i < R; i++) {
+        work[i] = avail[i];
+    }
+    for (int i = 0; i < P; i++) {
+        finish[i] = 0;
+    }
+    
+    int safeSeq[P], count = 0;
+    
+    while (count < P) {
+        bool found = false;
+        for (int p = 0; p < P; p++) {
+            if (!finish[p]) {
+                int j;
+                for (j = 0; j < R; j++) {
+                    if (need[p][j] > work[j]) {
+                        break;
+                    }
+                }
+                if (j == R) {
+                    for (int k = 0; k < R; k++) {
+                        work[k] += allot[p][k];
+                    }
+                    safeSeq[count++] = p;
+                    finish[p] = 1;
+                    found = true;
+                }
+            }
+        }
+        if (!found) {
+            return false;  // No safe sequence found, hence deadlock exists
+        }
+    }
+
+    // Safe Sequence found
+    printf("Safe Sequence: ");
+    for (int i = 0; i < P; i++) {
+        printf("P%d ", safeSeq[i]);
+    }
+    printf("\n");
+    return true;
+}
+
+// Function to calculate Need matrix
+void calculateNeed(int need[][R], int max[][R], int allot[][R]) {
+    for (int i = 0; i < P; i++) {
+        for (int j = 0; j < R; j++) {
+            need[i][j] = max[i][j] - allot[i][j];
+        }
+    }
+}
+
+// Driver code
+int main() {
+    // Maximum resources needed by each process
+    int max[][R] = {
+        {7, 5, 3},
+        {3, 2, 2},
+        {9, 0, 2},
+        {2, 2, 2},
+        {4, 3, 3}
+    };
+
+    // Resources allocated to each process
+    int allot[][R] = {
+        {0, 1, 0},
+        {2, 0, 0},
+        {3, 0, 2},
+        {2, 1, 1},
+        {0, 0, 2}
+    };
+
+    // Available resources in the system
+    int avail[] = {3, 3, 2};
+
+    int need[P][R];
+
+    // Calculate Need matrix
+    calculateNeed(need, max, allot);
+
+    // Check if the system is in a safe state
+    if (!isSafe(max, avail, max, allot, need)) {
+        printf("System is in an unsafe state.\n");
+    } else {
+        printf("System is in a safe state.\n");
+    }
+
+    return 0;
+}
