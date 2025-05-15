@@ -1,65 +1,43 @@
-// Earliest Deadline First (EDF)
-
-
-
 #include <stdio.h>
-#include <stdlib.h>
 
 typedef struct {
-    int id;
-    int arrival;
-    int burst;
-    int deadline;
-    int remaining;
+    int id, arrival, burst, deadline, remaining;
 } Process;
 
-
-int compare(const void *a, const void *b) {
-    Process *p1 = (Process *)a;
-    Process *p2 = (Process *)b;
-    return p1->deadline - p2->deadline;
-}
-
-
 void EDF_Scheduling(Process processes[], int n) {
-    int time = 0;
-    int completed = 0;
+    int time = 0, completed = 0;
 
-
-    qsort(processes, n, sizeof(Process), compare);
-
-    printf("Process Scheduling Order (Earliest Deadline First):\n");
-
-
+    // Run the EDF scheduling
     while (completed < n) {
-
+        int nextProcess = -1;
         for (int i = 0; i < n; i++) {
-            if (processes[i].arrival <= time && processes[i].remaining > 0) {
-                printf("At time %d: Process %d is running (Deadline: %d)\n", time, processes[i].id, processes[i].deadline);
-                processes[i].remaining--;
-                if (processes[i].remaining == 0) {
-                    completed++;
-                }
-                time++;
-                break;
+            if (processes[i].arrival <= time && processes[i].remaining > 0 && 
+                (nextProcess == -1 || processes[i].deadline < processes[nextProcess].deadline)) {
+                nextProcess = i;
             }
+        }
+
+        if (nextProcess != -1) {
+            printf("At time %d: Process %d is running (Deadline: %d)\n", time, processes[nextProcess].id, processes[nextProcess].deadline);
+            processes[nextProcess].remaining--;
+            if (processes[nextProcess].remaining == 0) {
+                completed++;
+            }
+            time++;
         }
     }
 }
 
 int main() {
     int n;
-
-
     printf("Enter the number of processes: ");
     scanf("%d", &n);
 
     Process processes[n];
 
-
     for (int i = 0; i < n; i++) {
         processes[i].id = i + 1;
-        printf("\nEnter details for Process %d:\n", i + 1);
+        printf("Enter details for Process %d:\n", i + 1);
         printf("Arrival Time: ");
         scanf("%d", &processes[i].arrival);
         printf("Burst Time: ");
@@ -69,8 +47,6 @@ int main() {
         processes[i].remaining = processes[i].burst;
     }
 
-
     EDF_Scheduling(processes, n);
-
     return 0;
 }
