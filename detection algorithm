@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+#define P 5  
+#define R 3  
+
+bool isDeadlocked(int allocation[][R], int request[][R], int n, int m) {
+    int finish[n], safeSeq[n], work[R];
+    for (int i = 0; i < n; i++) finish[i] = 0;
+    for (int i = 0; i < R; i++) {
+        work[i] = 0;
+        for (int j = 0; j < n; j++) work[i] += allocation[j][i];
+    }
+    int count = 0;
+    while (count < n) {
+        bool found = false;
+        for (int p = 0; p < n; p++) {
+            if (finish[p] == 0) {
+                bool canFinish = true;
+                for (int r = 0; r < R; r++) {
+                    if (request[p][r] > work[r]) {
+                        canFinish = false;
+                        break;
+                    }
+                }
+                if (canFinish) {
+                    for (int r = 0; r < R; r++) work[r] += allocation[p][r];
+                    finish[p] = 1;
+                    safeSeq[count++] = p;
+                    found = true;
+                }
+            }
+        }
+        if (!found) return true;
+    }
+    printf("Safe Sequence: ");
+    for (int i = 0; i < n; i++) printf("P%d ", safeSeq[i]);
+    printf("\n");
+    return false;
+}
+
+int main() {
+    int allocation[][R] = {
+        {0, 1, 0},
+        {2, 0, 0},
+        {3, 0, 2},
+        {2, 1, 1},
+        {0, 0, 2}
+    };
+    int request[][R] = {
+        {7, 5, 3},
+        {3, 2, 2},
+        {9, 0, 2},
+        {2, 2, 2},
+        {4, 3, 3}
+    };
+    if (isDeadlocked(allocation, request, P, R)) {
+        printf("The system is in a deadlock state.\n");
+    } else {
+        printf("The system is not in a deadlock state.\n");
+    }
+    return 0;
+}
